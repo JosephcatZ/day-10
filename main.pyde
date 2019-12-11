@@ -39,38 +39,23 @@ print(len(positions))
 data = {}
 Max = 0
 pos = []
-"""
-for i in positions:
-    temp = 0
-    for j in positions:
-        if i!=j:
-            o = sight(i[0],i[1],j[0],j[1])
-            temp+=o
-    if temp > Max:
-        Max = temp
-        pos = i
-"""  
 t = 0  
 Maxcount = 0
 pos = []
+bestsight = []
 Halt = False
-data = "["
-for i in positions:
-    data += "("+str(i[0])+","+str(i[1])+"),"
-data += "]"
-print(data)
-print(sight(0,4,0,2))
-def draw():
-
+def part_1(positions):
+    insight = []
     global t
     global Maxcount
     global pos
     global Halt
+    global bestsight
     background(0)
     X = positions[t%len(positions)][0]*dif+dif/2
     Y = positions[t%len(positions)][1]*dif+dif/2
-    #X=11*dif+dif/2
-    #Y = 13*dif+dif/2
+    #X= 27*dif+dif/2
+    #Y = 19*dif+dif/2
     if t > len(positions):
         print(t)
         X = pos[0]*dif+dif/2
@@ -79,17 +64,18 @@ def draw():
             print(pos,Maxcount)
             
             Halt = True
+            return(1)
     #X=mouseX
     #Y = mouseY
     count = 0
     for i in positions:
-        
         stroke(0,255,0)
         strokeWeight(0.25)
         if (sight(X/dif,Y/dif,i[0],i[1]) == 1 and i!=[X/dif,Y/dif]):
             count += 1
             line(X,Y,i[0]*dif+dif/2,i[1]*dif+dif/2)
             fill(0,255,0)
+            insight.append(i)
         else:
             fill(255)
         noStroke()
@@ -97,5 +83,70 @@ def draw():
     if Maxcount<count:
         Maxcount = count
         pos = [X/dif,Y/dif]
+        bestsight = []
+        for i in insight:
+            bestsight.append(i)
     t+=1
-    
+    return(0)
+p2 = 0
+temp = 0
+def part_2():
+    insight = []
+    global t
+    global Maxcount
+    global pos
+    global positions
+    global Halt
+    global bestsight
+    global temp
+    background(0)
+    #X= 27*dif+dif/2
+    #Y = 19*dif+dif/2
+    if positions == []:
+        return(3)
+    if t == 200:
+        global p2
+        p2 = temp
+        print(temp)
+    #X=mouseX
+    #Y = mouseY
+    count = 0
+    angles = []
+    Key = []
+    for i in positions:
+        ellipse(i[0]*dif+dif/2,i[1]*dif+dif/2,2,2)
+    for i in bestsight:
+        angles.append((degrees(atan2(i[1] - pos[1], i[0] - pos[0]))+90)%360)
+        Key.append(i)
+    temp = min(angles)
+    temp = angles.index(temp)
+    stroke(255,0,0)
+    line(pos[0]*dif+dif/2,pos[1]*dif+dif/2,Key[temp][0]*dif+dif/2,Key[temp][1]*dif+dif/2)
+    a = temp
+    temp = Key[temp]
+    bestsight.pop(a)
+    positions.remove(temp)
+    if bestsight == []:
+        for i in positions:
+            if (sight(X/dif,Y/dif,i[0],i[1]) == 1 and i!=[X/dif,Y/dif]):
+                count += 1
+                line(X,Y,i[0]*dif+dif/2,i[1]*dif+dif/2)
+                fill(0,255,0)
+                bestsight.append(i)
+    print(t,temp)
+    t+=1 
+    return(2)
+status = 0
+def draw():
+    global status
+    if status == 0:
+        status = part_1(positions)
+    if status == 1:
+        global t
+        t = 0
+        status = 2
+    if status == 2:
+        status = part_2()
+    if status ==3:
+        textAlign(CENTER,CENTER)
+        text(">Part 1:\t"+str(Maxcount)+"\n\n>Part 2:\t"+str(p2[0]*100+p2[1]),width/2,height/2)
